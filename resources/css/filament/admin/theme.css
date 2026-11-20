@@ -1,0 +1,13 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+/* Merapatkan jarak antar kelompok navigasi sidebar */
+.fi-sidebar-nav-groups {
+    gap: 0.5rem !important;
+}
+
+.fi-sidebar-group {
+    margin-block: 0 !important;
+}

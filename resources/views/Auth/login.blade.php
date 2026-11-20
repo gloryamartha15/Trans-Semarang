@@ -1,0 +1,165 @@
+@extends('Layout.app')
+
+@section('title', 'Login | Trans Semarang')
+
+@section('content')
+
+<style>
+.auth-section {
+    min-height: 75vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px 20px;
+    background: #f5f8fc;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 460px;
+    background: white;
+    padding: 38px;
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.07);
+}
+
+.auth-card h1 {
+    font-size: 27px;
+    color: #173b68;
+    margin-bottom: 8px;
+}
+
+.auth-description {
+    color: #718096;
+    margin-bottom: 28px;
+}
+
+.auth-group {
+    margin-bottom: 18px;
+}
+
+.auth-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.auth-group input {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid #dbe3ed;
+    border-radius: 9px;
+    font-size: 15px;
+    outline: none;
+}
+
+.auth-group input:focus {
+    border-color: #2563eb;
+}
+
+.auth-button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 9px;
+    background: #174a80;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.auth-button:hover {
+    background: #10375f;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 22px;
+    color: #64748b;
+}
+
+.auth-footer a {
+    color: #174a80;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-error {
+    color: #dc2626;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.auth-remember {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    color: #475569;
+    font-size: 14px;
+}
+</style>
+
+<section class="auth-section">
+    <div class="auth-card">
+
+        <h1>Selamat Datang!</h1>
+
+        <p class="auth-description">
+            Login untuk mengirim dan memantau pengaduan layanan Trans Semarang.
+        </p>
+
+        @if (session('status'))
+            <p>{{ session('status') }}</p>
+        @endif
+
+        <form action="{{ route('login.store') }}" method="POST">
+            @csrf
+
+            <div class="auth-group">
+                <label for="email">Email</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value="{{ old('email') }}"
+                    placeholder="Masukkan email"
+                    required
+                >
+                @error('email')
+                    <div class="auth-error">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="auth-group">
+                <label for="password">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Masukkan password"
+                    required
+                >
+            </div>
+
+            <label class="auth-remember">
+                <input type="checkbox" name="remember" value="1">
+                Ingat saya
+            </label>
+
+            <button type="submit" class="auth-button">
+                Login
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            Belum punya akun?
+            <a href="{{ route('register') }}">Daftar sekarang</a>
+        </div>
+
+    </div>
+</section>
+
+@endsection
