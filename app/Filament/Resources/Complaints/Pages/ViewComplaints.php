@@ -16,6 +16,21 @@ class ViewComplaints extends ViewRecord
 {
     protected static string $resource = ComplaintsResource::class;
 
+    private function canChangeComplaintStatus(): bool
+    {
+        $user = Auth::user();
+
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        if ($user->role === 'super_admin') {
+            return true;
+        }
+
+        return in_array($user->role, ['admin', 'petugas'], true)
+            && $user->hasPermissionTo('Update:ComplaintStatus', 'admin');
+    }
     protected function getHeaderActions(): array
     {
         return [
