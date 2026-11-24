@@ -30,10 +30,12 @@ class ReplaysRelationManager extends RelationManager
         return $schema->components([
             Textarea::make('tanggapan')
                 ->label('Tanggapan')
+                ->placeholder('Tuliskan tanggapan terhadap pengaduan...')
                 ->required()
                 ->minLength(10)
                 ->maxLength(5000)
-                ->rows(5),
+                ->rows(5)
+                ->columnSpanFull(),
         ]);
     }
 
@@ -59,6 +61,10 @@ class ReplaysRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make()
                     ->label('Tambah Tanggapan')
+                    ->modalHeading('Buat Tanggapan Aduan')
+                    ->modalWidth('2xl')
+                    ->modalSubmitActionLabel('Simpan Tanggapan')
+                    ->modalCancelActionLabel('Batal')
                     ->visible(fn (): bool =>
                         in_array(
                             Auth::user()?->role,

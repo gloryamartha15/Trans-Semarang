@@ -155,20 +155,20 @@
 
                         <select
                             id="stop_id"
-                            name="stops"
-                            class="form-select-custom @error('stops') is-invalid @enderror"
+                            name="stop_id"
+                            class="form-select-custom @error('stop_id') is-invalid @enderror"
                         >
                             <option value="">-- Pilih Halte --</option>
 
                             @foreach ($stops as $stop)
                                 <option value="{{ $stop->id }}"
-                                    @selected(old('stops', $selectedStopId) == $stop->id)>
+                                    @selected(old('stop_id', $selectedStopId) == $stop->id)>
                                     {{ $stop->name_stop }}
                                 </option>
                             @endforeach
                         </select>
 
-                        @error('stops')
+                        @error('stop_id')
                             <p class="error-message">{{ $message }}</p>
                         @enderror
                     </div>
