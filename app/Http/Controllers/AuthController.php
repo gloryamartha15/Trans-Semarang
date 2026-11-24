@@ -49,43 +49,49 @@ class AuthController extends Controller
     }
 
     // Memproses login pengguna
-    public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
 
-        if (! Auth::guard('web')->attempt(
-            $credentials,
-            $request->boolean('remember')
-        )) {
-            return back()
-                ->withErrors([
-                    'email' => 'Email atau password tidak sesuai.',
-                ])
-                ->onlyInput('email');
-        }
+public function login(Request $request)
+{
+    $credentials = $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+    ]);
 
-        $user = Auth::guard('web')->user();
+    if (! Auth::guard('web')->attempt(
+        $credentials,
+        $request->boolean('remember')
+    )) {
+        return back()
+            ->withErrors([
+                'email' => 'Email atau password tidak sesuai.',
+            ])
+            ->onlyInput('email');
+    }
 
-        // Hanya role pengguna yang boleh masuk ke portal aduan
-        if (! $user->hasRole('pengguna')) {
-            Auth::guard('web')->logout();
+    $user = Auth::guard('web')->user();
 
-            $request->session()->regenerate();
-
-            return back()
-                ->withErrors([
-                    'email' => 'Akun ini tidak memiliki akses ke portal pengguna.',
-                ])
-                ->onlyInput('email');
-        }
+    // Role yang diperbolehkan masuk ke portal aduan
+    if (! in_array($user->role, [
+        'pengguna',
+        'admin',
+        'super_admin',
+    ], true)) {
+        Auth::guard('web')->logout();
 
         $request->session()->regenerate();
+        $request->session()->regenerateToken();
 
-        return redirect()->intended(route('aduan.index'));
+        return back()
+            ->withErrors([
+                'email' => 'Akun ini tidak memiliki akses ke portal aduan.',
+            ])
+            ->onlyInput('email');
     }
+
+    $request->session()->regenerate();
+
+    return redirect()->intended(route('aduan.index'));
+}
 
     // Logout pengguna
     public function logout(Request $request)
