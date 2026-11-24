@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Petugas\Pages;
 
 use App\Filament\Resources\Petugas\PetugasResource;
-use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditPetugas extends EditRecord
@@ -18,11 +17,9 @@ class EditPetugas extends EditRecord
         return $data;
     }
 
-    protected function getHeaderActions(): array
+    protected function afterSave(): void
     {
-        return [
-            DeleteAction::make()
-                ->label('Hapus Petugas'),
-        ];
+        // Menyinkronkan role pada Spatie Permission.
+        $this->record->syncRoles(['petugas']);
     }
 }

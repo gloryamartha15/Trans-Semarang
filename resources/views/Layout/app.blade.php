@@ -1068,6 +1068,7 @@
     <main>
         @yield('content')
     </main>
+<br><br><br><br><br><br><br><br>
 
     {{-- FOOTER --}}
     <footer>

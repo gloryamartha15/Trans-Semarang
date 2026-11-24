@@ -1,3 +1,4 @@
+
 @extends('Layout.app')
 
 @section('title', 'Riwayat Pengaduan | Trans Semarang')
@@ -38,20 +39,26 @@
 
                 <p>
                     Bus:
-                    {{ $complaint->buses->bus_number
-                        ?? $complaint->buses->police_number
-                        ?? '-' }}
+                    {{ $complaint->bus?->police_number ?? '-' }}
                 </p>
 
                 <p>
                     Halte:
-                    {{ $complaint->stops->name_stop ?? '-' }}
+                    {{ $complaint->stop?->name_stop ?? '-' }}
                 </p>
 
                 <small>
                     Dikirim pada:
                     {{ $complaint->created_at->format('d-m-Y H:i') }}
                 </small>
+
+                <div style="margin-top: 16px;">
+                    <a href="{{ route('aduan.detail', $complaint->id) }}"
+                       class="btn btn-primary"
+                       style="display: inline-block;">
+                        Lihat Detail Aduan →
+                    </a>
+                </div>
 
             </div>
         @empty

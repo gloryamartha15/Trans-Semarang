@@ -4,6 +4,8 @@ use App\Http\Controllers\AduanController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\GoogleAuthController;
+use Illuminate\Support\Facades\Auth;
 
 // Halaman utama
 Route::get('/', function () {
@@ -34,6 +36,10 @@ Route::get('/riwayat-aduan', [AduanController::class, 'history'])
     ->middleware('auth:web')
     ->name('aduan.history');
 
+Route::get('/riwayat-aduan/{id}', [AduanController::class, 'detail'])
+    ->middleware('auth:web')
+    ->name('aduan.detail');
+
 // Lacak pengaduan
 Route::get('/lacak-aduan', [AduanController::class, 'track'])
     ->name('aduan.track');
@@ -48,6 +54,12 @@ Route::get('/scan-qr', function () {
     return view('QR.scan');
 })->name('qr.scan');
 
+Route::get('/informasi-tidak-aktif', function (\Illuminate\Http\Request $request) {
+    return view('Aduan.inactive', [
+        'type' => $request->query('type'),
+    ]);
+})->name('aduan.inactive');
+
 // Pengaduan
 Route::resource('aduan', AduanController::class);
 
@@ -55,8 +67,8 @@ Route::resource('aduan', AduanController::class);
 Route::get('/profil', function () {
     return view('Auth.profile');
 })
-->middleware('auth:web')
-->name('profile');
+    ->middleware('auth:web')
+    ->name('profile');
 
 Route::middleware('auth:web')->group(function () {
     Route::get('/profil', function () {
@@ -75,3 +87,14 @@ Route::middleware('auth:web')->group(function () {
     Route::put('/profil/ganti-password', [ProfileController::class, 'updatePassword'])
         ->name('profile.password.update');
 });
+
+//verifikasi google
+Route::get('/auth/google', [
+    GoogleAuthController::class,
+    'redirect',
+])->name('google.redirect');
+
+Route::get('/auth/google/callback', [
+    GoogleAuthController::class,
+    'callback',
+])->name('google.callback');

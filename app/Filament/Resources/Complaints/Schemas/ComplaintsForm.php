@@ -27,14 +27,14 @@ class ComplaintsForm
 
                 Select::make('bus_id')
                     ->label('Bus')
-                    ->relationship('buses', 'police_number')
+                    ->relationship('bus', 'police_number')
                     ->searchable()
                     ->preload()
                     ->nullable(),
 
                 Select::make('stop_id')
                     ->label('Halte')
-                    ->relationship('stops', 'name_stop')
+                    ->relationship('stop', 'name_stop')
                     ->searchable()
                     ->preload()
                     ->nullable(),
@@ -67,15 +67,6 @@ class ComplaintsForm
                     ->nullable()
                     ->columnSpanFull(),
 
-                Select::make('status_aduan')
-                    ->label('Status Pengaduan')
-                    ->options([
-                        'diajukan' => 'Diajukan',
-                        'ditindaklanjuti' => 'Ditanggapi',
-                        'selesai' => 'Selesai',
-                    ])
-                    ->default('diajukan')
-                    ->required(),
             ])
             ->columns(2);
     }

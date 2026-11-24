@@ -9,9 +9,10 @@ class CreateComplaints extends CreateRecord //ini untuk buat data baru (inherita
 {
     protected static string $resource = ComplaintsResource::class;
 
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        unset($data['no_aduan']); //menghapus nilai nomor aduan dari array yang sedang diproses sebelum membuat nomor baru
+        unset($data['no_aduan']);
 
         $tanggal = now()->format('Ymd');
         $prefix = 'ADU-' . $tanggal . '-';
@@ -27,6 +28,9 @@ class CreateComplaints extends CreateRecord //ini untuk buat data baru (inherita
             : 1;
 
         $data['no_aduan'] = $prefix . str_pad($urutan, 4, '0', STR_PAD_LEFT);
+
+        // Status awal selalu ditetapkan oleh sistem.
+        $data['status_aduan'] = 'diajukan';
 
         return $data;
     }

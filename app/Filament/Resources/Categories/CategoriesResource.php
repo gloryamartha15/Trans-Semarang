@@ -25,13 +25,13 @@ class CategoriesResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Data Master';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 6;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTag;
 
     protected static ?string $model = Categories::class;
 
-    protected static ?string $recordTitleAttribute = 'Categories';
+    protected static ?string $recordTitleAttribute = 'jenis_aduan';
 
     public static function form(Schema $schema): Schema
     {

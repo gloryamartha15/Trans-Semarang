@@ -22,7 +22,7 @@ return new class extends Migration
         $table->string('judul');
         $table->longText('isi_aduan');
         $table->string('dokumentasi')->nullable();
-        $table->enum('status_aduan',['diajukan','diverifikasi','ditindaklanjuti','selesai'])->default('diajukan');
+        $table->enum('status_aduan',['diajukan','ditanggapi','selesai','ditolak'])->default('diajukan');
         $table->timestamps();
     });
     }

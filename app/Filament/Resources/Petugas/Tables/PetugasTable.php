@@ -2,8 +2,7 @@
 
 namespace App\Filament\Resources\Petugas\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -28,18 +27,14 @@ class PetugasTable
                     ->date('d M Y')
                     ->sortable(),
             ])
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->recordActions([
                 EditAction::make()
                     ->label('Edit'),
+
+                DeleteAction::make()
+                    ->label('Hapus'),
             ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->label('Hapus Terpilih'),
-                ]),
-            ]);
+            ->toolbarActions([]);
     }
 }

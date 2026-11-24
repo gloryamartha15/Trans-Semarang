@@ -2,12 +2,13 @@
 
 namespace App\Filament\Resources\Complaints\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Actions\Action;
+use App\Filament\Resources\Complaints\ComplaintsResource;
+use Illuminate\Support\Facades\Auth;
 
 class ComplaintsTable
 {
@@ -33,25 +34,26 @@ class ComplaintsTable
                     ->label('Kategori')
                     ->searchable(),
 
-                TextColumn::make('buses.police_number')
+                TextColumn::make('bus.police_number')
                     ->label('Nomor Polisi Bus')
                     ->placeholder('-'),
 
-                TextColumn::make('stops.name_stop')
+                TextColumn::make('stop.name_stop')
                     ->label('Nama Halte')
                     ->placeholder('-'),
 
                 TextColumn::make('status_aduan')
                     ->label('Status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'diajukan' => 'warning',
                         'ditanggapi' => 'info',
                         'selesai' => 'success',
+                        'ditolak' => 'danger',
                         default => 'gray',
                     })
                     ->formatStateUsing(
-                        fn (string $state): string => ucfirst($state)
+                        fn(string $state): string => ucfirst($state)
                     ),
 
                 TextColumn::make('created_at')
@@ -66,6 +68,7 @@ class ComplaintsTable
                         'diajukan' => 'Diajukan',
                         'ditanggapi' => 'Ditanggapi',
                         'selesai' => 'Selesai',
+                        'ditolak' => 'Ditolak',
                     ]),
 
                 SelectFilter::make('categories_id')
@@ -73,13 +76,20 @@ class ComplaintsTable
                     ->relationship('categories', 'jenis_aduan'),
             ])
             ->recordActions([
+                Action::make('detail')
+                    ->label('Detail')
+                    ->url(fn($record): string => ComplaintsResource::getUrl('view', [
+                        'record' => $record,
+                    ]))
+                    ->visible(fn(): bool => Auth::user()?->role === 'petugas'),
+
                 EditAction::make()
-                    ->label('Kelola'),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+                    ->label('Kelola')
+                    ->visible(fn(): bool => in_array(
+                        Auth::user()?->role,
+                        ['admin', 'super_admin'],
+                        true
+                    )),
             ]);
     }
 }

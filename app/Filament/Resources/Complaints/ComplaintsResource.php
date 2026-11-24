@@ -4,17 +4,19 @@ namespace App\Filament\Resources\Complaints;
 
 use App\Filament\Resources\Complaints\Pages\CreateComplaints;
 use App\Filament\Resources\Complaints\Pages\EditComplaints;
+use App\Filament\Resources\Complaints\Pages\ViewComplaints;
 use App\Filament\Resources\Complaints\Pages\ListComplaints;
 use App\Filament\Resources\Complaints\Schemas\ComplaintsForm;
 use App\Filament\Resources\Complaints\Tables\ComplaintsTable;
 use App\Filament\Resources\Complaints\RelationManagers\ReplaysRelationManager;
+use App\Filament\Resources\Complaints\RelationManagers\StatusHistoriesRelationManager;
 use App\Models\Complaints;
-use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use UnitEnum;
+use BackedEnum;
 
 class ComplaintsResource extends Resource
 {
@@ -43,6 +45,7 @@ class ComplaintsResource extends Resource
     {
         return [
             ReplaysRelationManager::class,
+            StatusHistoriesRelationManager::class,
         ];
     }
 
@@ -56,6 +59,7 @@ class ComplaintsResource extends Resource
         return [
             'index' => ListComplaints::route('/'),
             'create' => CreateComplaints::route('/create'),
+            'view' => ViewComplaints::route('/{record}'),
             'edit' => EditComplaints::route('/{record}/edit'),
         ];
     }

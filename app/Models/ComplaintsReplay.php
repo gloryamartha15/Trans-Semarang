@@ -12,6 +12,7 @@ class ComplaintsReplay extends Model
         'complaints_id',
         'id_petugas',
         'tanggapan',
+        'cycle_number',
     ];
 
     public function complaints()

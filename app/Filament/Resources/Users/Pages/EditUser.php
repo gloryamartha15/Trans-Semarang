@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Users\Pages;
 
 use App\Filament\Resources\Users\UserResource;
-use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditUser extends EditRecord
@@ -12,17 +11,15 @@ class EditUser extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        // Memastikan role tetap pengguna.
+        // Memastikan role database tetap pengguna.
         $data['role'] = 'pengguna';
 
         return $data;
     }
 
-    protected function getHeaderActions(): array
+    protected function afterSave(): void
     {
-        return [
-            DeleteAction::make()
-                ->label('Hapus Pengguna'),
-        ];
+        // Menyinkronkan Spatie Role.
+        $this->record->syncRoles(['pengguna']);
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -23,14 +22,6 @@ class UserForm
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->maxLength(255),
-
-                TextInput::make('role')
-                    ->default('pengguna')
-                    ->dehydrated()
-                    ->hidden(),
-
-                DateTimePicker::make('email_verified_at')
-                    ->label('Tanggal Verifikasi Email'),
 
                 TextInput::make('password')
                     ->label('Password')

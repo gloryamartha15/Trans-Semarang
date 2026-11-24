@@ -28,8 +28,11 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => $validated['password'],
+            'password' => Hash::make($validated['password']),
         ]);
+
+        // Registrasi publik otomatis mendapatkan role pengguna
+        $user->assignRole('pengguna');
 
         Auth::guard('web')->login($user);
 
@@ -53,9 +56,6 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        // Hanya akun dengan role pengguna yang boleh login di website
-        $credentials['role'] = 'pengguna';
-
         if (! Auth::guard('web')->attempt(
             $credentials,
             $request->boolean('remember')
@@ -63,6 +63,21 @@ class AuthController extends Controller
             return back()
                 ->withErrors([
                     'email' => 'Email atau password tidak sesuai.',
+                ])
+                ->onlyInput('email');
+        }
+
+        $user = Auth::guard('web')->user();
+
+        // Hanya role pengguna yang boleh masuk ke portal aduan
+        if (! $user->hasRole('pengguna')) {
+            Auth::guard('web')->logout();
+
+            $request->session()->regenerate();
+
+            return back()
+                ->withErrors([
+                    'email' => 'Akun ini tidak memiliki akses ke portal pengguna.',
                 ])
                 ->onlyInput('email');
         }
@@ -77,7 +92,6 @@ class AuthController extends Controller
     {
         Auth::guard('web')->logout();
 
-        // Mempertahankan sesi guard admin
         $request->session()->regenerate();
         $request->session()->regenerateToken();
 

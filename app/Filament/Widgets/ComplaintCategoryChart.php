@@ -19,19 +19,42 @@ class ComplaintCategoryChart extends ChartWidget
 
     protected function getData(): array
     {
+        $period = $this->pageFilters['period'] ?? 'all';
+
+        $startYear = $this->pageFilters['startYear'] ?? null;
+        $endYear = $this->pageFilters['endYear'] ?? null;
+
         $startDate = $this->pageFilters['startDate'] ?? null;
         $endDate = $this->pageFilters['endDate'] ?? null;
 
         $categories = Categories::query()
-            ->leftJoin('complaints', function (JoinClause $join) use ($startDate, $endDate) {
+            ->leftJoin('complaints', function (JoinClause $join) use (
+                $period,
+                $startYear,
+                $endYear,
+                $startDate,
+                $endDate
+            ) {
                 $join->on('categories.id', '=', 'complaints.categories_id');
 
-                if ($startDate) {
-                    $join->whereDate('complaints.created_at', '>=', $startDate);
+                if ($period === 'year_range') {
+                    if ($startYear) {
+                        $join->whereYear('complaints.created_at', '>=', $startYear);
+                    }
+
+                    if ($endYear) {
+                        $join->whereYear('complaints.created_at', '<=', $endYear);
+                    }
                 }
 
-                if ($endDate) {
-                    $join->whereDate('complaints.created_at', '<=', $endDate);
+                if ($period === 'date_range') {
+                    if ($startDate) {
+                        $join->whereDate('complaints.created_at', '>=', $startDate);
+                    }
+
+                    if ($endDate) {
+                        $join->whereDate('complaints.created_at', '<=', $endDate);
+                    }
                 }
             })
             ->select('categories.jenis_aduan')
@@ -47,6 +70,21 @@ class ComplaintCategoryChart extends ChartWidget
                 ],
             ],
             'labels' => $categories->pluck('jenis_aduan')->toArray(),
+        ];
+    }
+
+    protected function getOptions(): array
+    {
+        return [
+            'scales' => [
+                'y' => [
+                    'beginAtZero' => true,
+                    'ticks' => [
+                        'precision' => 0,
+                        'maxTicksLimit' => 7,
+                    ],
+                ],
+            ],
         ];
     }
 

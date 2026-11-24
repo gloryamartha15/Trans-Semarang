@@ -22,20 +22,38 @@ class ComplaintLatestTable extends TableWidget
     public function table(Table $table): Table
     {
         return $table
+
             ->query(function (): Builder {
                 $query = Complaints::query()
                     ->with(['categories'])
                     ->latest();
 
-                $startDate = $this->pageFilters['startDate'] ?? null;
-                $endDate = $this->pageFilters['endDate'] ?? null;
+                $period = $this->pageFilters['period'] ?? 'all';
 
-                if ($startDate) {
-                    $query->whereDate('created_at', '>=', $startDate);
+                if ($period === 'year_range') {
+                    $startYear = $this->pageFilters['startYear'] ?? null;
+                    $endYear = $this->pageFilters['endYear'] ?? null;
+
+                    if ($startYear) {
+                        $query->whereYear('created_at', '>=', $startYear);
+                    }
+
+                    if ($endYear) {
+                        $query->whereYear('created_at', '<=', $endYear);
+                    }
                 }
 
-                if ($endDate) {
-                    $query->whereDate('created_at', '<=', $endDate);
+                if ($period === 'date_range') {
+                    $startDate = $this->pageFilters['startDate'] ?? null;
+                    $endDate = $this->pageFilters['endDate'] ?? null;
+
+                    if ($startDate) {
+                        $query->whereDate('created_at', '>=', $startDate);
+                    }
+
+                    if ($endDate) {
+                        $query->whereDate('created_at', '<=', $endDate);
+                    }
                 }
 
                 return $query;
@@ -63,10 +81,11 @@ class ComplaintLatestTable extends TableWidget
                 TextColumn::make('status_aduan')
                     ->label('Status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'diajukan' => 'warning',
                         'ditanggapi' => 'info',
                         'selesai' => 'success',
+                        'ditolak' => 'danger',
                         default => 'gray',
                     }),
             ])

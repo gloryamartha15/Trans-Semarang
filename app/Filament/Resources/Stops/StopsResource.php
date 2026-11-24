@@ -31,7 +31,7 @@ class StopsResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedMapPin;
 
-    protected static ?string $recordTitleAttribute = 'Stops';
+    protected static ?string $recordTitleAttribute = 'name_stop';
 
     public static function form(Schema $schema): Schema
     {

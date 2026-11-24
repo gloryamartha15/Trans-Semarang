@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -20,7 +21,14 @@ class Complaints extends Model
         'isi_aduan',
         'dokumentasi',
         'status_aduan',
+        'response_cycle',
     ];
+
+    public function statusHistories(): HasMany
+    {
+        return $this->hasMany(ComplaintStatusHistory::class, 'complaint_id')
+            ->latest();
+    }
 
     protected static function booted(): void
     {
@@ -34,7 +42,7 @@ class Complaints extends Model
         });
     }
 
-    public function buses()
+    public function bus()
     {
         return $this->belongsTo(Buses::class, 'bus_id');
     }
@@ -44,7 +52,7 @@ class Complaints extends Model
         return $this->belongsTo(Categories::class, 'categories_id');
     }
 
-    public function stops()
+    public function stop()
     {
         return $this->belongsTo(Stops::class, 'stop_id');
     }
@@ -53,6 +61,7 @@ class Complaints extends Model
     {
         return $this->hasMany(ComplaintsReplay::class, 'complaints_id');
     }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

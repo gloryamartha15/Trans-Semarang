@@ -11,9 +11,15 @@ class CreatePetugas extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // Memastikan akun yang dibuat selalu memiliki role petugas.
+        // Memastikan role database selalu petugas.
         $data['role'] = 'petugas';
 
         return $data;
+    }
+
+    protected function afterCreate(): void
+    {
+        // Menyinkronkan Spatie Role setelah akun dibuat.
+        $this->record->syncRoles(['petugas']);
     }
 }

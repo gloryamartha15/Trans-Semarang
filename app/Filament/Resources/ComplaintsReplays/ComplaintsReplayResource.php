@@ -2,10 +2,7 @@
 
 namespace App\Filament\Resources\ComplaintsReplays;
 
-use App\Filament\Resources\ComplaintsReplays\Pages\CreateComplaintsReplay;
-use App\Filament\Resources\ComplaintsReplays\Pages\EditComplaintsReplay;
 use App\Filament\Resources\ComplaintsReplays\Pages\ListComplaintsReplays;
-use App\Filament\Resources\ComplaintsReplays\Schemas\ComplaintsReplayForm;
 use App\Filament\Resources\ComplaintsReplays\Tables\ComplaintsReplaysTable;
 use App\Models\ComplaintsReplay;
 use BackedEnum;
@@ -21,7 +18,7 @@ class ComplaintsReplayResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Tanggapan Aduan';
 
-    protected static ?string $navigationLabel = 'Kelola Aduan';
+    protected static ?string $navigationLabel = 'Tanggapan';
 
     protected static string|UnitEnum|null $navigationGroup = 'Aduan';
 
@@ -31,11 +28,11 @@ class ComplaintsReplayResource extends Resource
 
     protected static ?string $model = ComplaintsReplay::class;
 
-    protected static ?string $recordTitleAttribute = 'Complaints Replay';
+    protected static ?string $recordTitleAttribute = 'tanggapan';
 
     public static function form(Schema $schema): Schema
     {
-        return ComplaintsReplayForm::configure($schema);
+        return $schema;
     }
 
     public static function table(Table $table): Table
@@ -43,19 +40,10 @@ class ComplaintsReplayResource extends Resource
         return ComplaintsReplaysTable::configure($table);
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
             'index' => ListComplaintsReplays::route('/'),
-            'create' => CreateComplaintsReplay::route('/create'),
-            'edit' => EditComplaintsReplay::route('/{record}/edit'),
         ];
     }
 }

@@ -17,15 +17,31 @@ class ComplaintStats extends StatsOverviewWidget
     {
         $query = Complaints::query();
 
-        $startDate = $this->pageFilters['startDate'] ?? null;
-        $endDate = $this->pageFilters['endDate'] ?? null;
+        $period = $this->pageFilters['period'] ?? 'all';
 
-        if ($startDate) {
-            $query->whereDate('created_at', '>=', $startDate);
+        // Filter berdasarkan tahun
+        if ($period === 'year_range') {
+            $startYear = $this->pageFilters['startYear'] ?? null;
+            $endYear = $this->pageFilters['endYear'] ?? null;
+
+            if ($startYear && $endYear) {
+                $query->whereYear('created_at', '>=', $startYear)
+                    ->whereYear('created_at', '<=', $endYear);
+            }
         }
 
-        if ($endDate) {
-            $query->whereDate('created_at', '<=', $endDate);
+        // Filter berdasarkan tanggal
+        if ($period === 'date_range') {
+            $startDate = $this->pageFilters['startDate'] ?? null;
+            $endDate = $this->pageFilters['endDate'] ?? null;
+
+            if ($startDate) {
+                $query->whereDate('created_at', '>=', $startDate);
+            }
+
+            if ($endDate) {
+                $query->whereDate('created_at', '<=', $endDate);
+            }
         }
 
         $total = (clone $query)->count();
@@ -42,6 +58,10 @@ class ComplaintStats extends StatsOverviewWidget
             ->where('status_aduan', 'selesai')
             ->count();
 
+        $ditolak = (clone $query)
+            ->where('status_aduan', 'ditolak')
+            ->count();
+
         return [
             Stat::make('Total Pengaduan', $total)
                 ->description('Seluruh pengaduan dalam periode')
@@ -52,12 +72,16 @@ class ComplaintStats extends StatsOverviewWidget
                 ->color('warning'),
 
             Stat::make('Ditanggapi', $ditanggapi)
-                ->description('Pengaduan telah diverifikasi')
+                ->description('Pengaduan telah ditanggapi')
                 ->color('info'),
 
             Stat::make('Selesai', $selesai)
                 ->description('Pengaduan telah diselesaikan')
                 ->color('success'),
+
+            Stat::make('Ditolak', $ditolak)
+                ->description('Pengaduan ditolak')
+                ->color('danger'),
         ];
     }
 }

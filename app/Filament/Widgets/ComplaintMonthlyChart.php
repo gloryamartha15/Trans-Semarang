@@ -19,16 +19,39 @@ class ComplaintMonthlyChart extends ChartWidget
 
     protected function getData(): array
     {
-        $startDate = $this->pageFilters['startDate'] ?? null;
-        $endDate = $this->pageFilters['endDate'] ?? null;
+        $period = $this->pageFilters['period'] ?? 'all';
 
-        $mulai = $startDate
-            ? Carbon::parse($startDate)->startOfDay()
-            : Carbon::now()->startOfYear();
+        if ($period === 'year_range') {
+            $startYear = $this->pageFilters['startYear'] ?? null;
+            $endYear = $this->pageFilters['endYear'] ?? null;
 
-        $sampai = $endDate
-            ? Carbon::parse($endDate)->endOfDay()
-            : Carbon::now()->endOfDay();
+            $mulai = $startYear
+                ? Carbon::create((int) $startYear, 1, 1)->startOfDay()
+                : Carbon::now()->startOfYear();
+
+            $sampai = $endYear
+                ? Carbon::create((int) $endYear, 12, 31)->endOfDay()
+                : Carbon::now()->endOfDay();
+        } elseif ($period === 'date_range') {
+            $startDate = $this->pageFilters['startDate'] ?? null;
+            $endDate = $this->pageFilters['endDate'] ?? null;
+
+            $mulai = $startDate
+                ? Carbon::parse($startDate)->startOfDay()
+                : Carbon::now()->startOfYear();
+
+            $sampai = $endDate
+                ? Carbon::parse($endDate)->endOfDay()
+                : Carbon::now()->endOfDay();
+        } else {
+            $firstDate = Complaints::min('created_at');
+
+            $mulai = $firstDate
+                ? Carbon::parse($firstDate)->startOfDay()
+                : Carbon::now()->startOfYear();
+
+            $sampai = Carbon::now()->endOfDay();
+        }
 
         if ($mulai->gt($sampai)) {
             return [
@@ -101,6 +124,20 @@ class ComplaintMonthlyChart extends ChartWidget
         ];
     }
 
+    protected function getOptions(): array
+    {
+        return [
+            'scales' => [
+                'y' => [
+                    'beginAtZero' => true,
+                    'ticks' => [
+                        'precision' => 0,
+                        'maxTicksLimit' => 7,
+                    ],
+                ],
+            ],
+        ];
+    }
     protected function getType(): string
     {
         return 'line';

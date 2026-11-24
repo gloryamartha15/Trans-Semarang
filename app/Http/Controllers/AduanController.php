@@ -8,27 +8,53 @@ use App\Models\Complaints;
 use App\Models\Stops;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class AduanController extends Controller
 {
     public function index()
     {
-    return view('Layout.home');
+        return view('Layout.home');
     }
+
+
 
     public function create(Request $request)
     {
         $categories = Categories::all();
+
+        // Dropdown hanya menampilkan Bus dan Halte aktif.
         $buses = Buses::where('is_active', true)->get();
-        $stops = Stops::all();
+        $stops = Stops::where('is_active', true)->get();
 
-        $selectedBusId = Buses::whereKey(
-            $request->query('bus_id')
-        )->value('id');
+        $selectedBusId = null;
+        $selectedStopId = null;
 
-        $selectedStopId = Stops::whereKey(
-            $request->query('stop_id')
-        )->value('id');
+        // Pemeriksaan QR Bus.
+        if ($request->filled('bus_id')) {
+            $selectedBusId = Buses::whereKey($request->query('bus_id'))
+                ->where('is_active', true)
+                ->value('id');
+
+            if (!$selectedBusId) {
+                return redirect()->route('aduan.inactive', [
+                    'type' => 'bus',
+                ]);
+            }
+        }
+
+        // Pemeriksaan QR Halte.
+        if ($request->filled('stop_id')) {
+            $selectedStopId = Stops::whereKey($request->query('stop_id'))
+                ->where('is_active', true)
+                ->value('id');
+
+            if (!$selectedStopId) {
+                return redirect()->route('aduan.inactive', [
+                    'type' => 'halte',
+                ]);
+            }
+        }
 
         return view('Aduan.create', compact(
             'categories',
@@ -50,8 +76,15 @@ class AduanController extends Controller
 
             'judul' => 'required|string|max:125',
             'categories' => 'required|exists:categories,id',
-            'nama_bus' => 'nullable|exists:buses,id',
-            'stops' => 'nullable|exists:stops,id',
+            'nama_bus' => [
+                'nullable',
+                Rule::exists('buses', 'id')->where('is_active', true),
+            ],
+
+            'stop_id' => [
+                'nullable',
+                Rule::exists('stops', 'id')->where('is_active', true),
+            ],
             'isi_aduan' => 'required|string',
 
             'dokumentasi' => [
@@ -65,8 +98,8 @@ class AduanController extends Controller
             'judul.required' => 'Judul pengaduan wajib diisi.',
             'categories.required' => 'Silakan pilih kategori pengaduan.',
             'categories.exists' => 'Kategori pengaduan tidak valid.',
-            'nama_bus.exists' => 'Data bus tidak ditemukan.',
-            'stops.exists' => 'Data halte tidak ditemukan.',
+            'nama_bus.exists' => 'Bus tidak ditemukan atau sudah tidak aktif.',
+            'stop_id.exists' => 'Halte tidak ditemukan atau sudah tidak aktif.',
             'isi_aduan.required' => 'Isi pengaduan wajib diisi.',
             'dokumentasi.mimes' => 'Dokumentasi harus berupa JPG, JPEG, PNG, atau PDF.',
             'dokumentasi.max' => 'Ukuran dokumentasi maksimal 2 MB.',
@@ -85,7 +118,7 @@ class AduanController extends Controller
             'judul' => $validated['judul'],
             'nama_pengadu' => $user?->name ?? $validated['nama_pengadu'],
             'bus_id' => $validated['nama_bus'] ?? null,
-            'stop_id' => $validated['stops'] ?? null,
+            'stop_id' => $validated['stop_id'] ?? null,
             'isi_aduan' => $validated['isi_aduan'],
             'dokumentasi' => $dokumentasi,
             'status_aduan' => 'diajukan',
@@ -98,31 +131,31 @@ class AduanController extends Controller
     }
 
     public function track(Request $request)
-{
-    $request->validate([
-        'no_aduan' => 'nullable|string|max:50',
-    ]);
+    {
+        $request->validate([
+            'no_aduan' => 'nullable|string|max:50',
+        ]);
 
-    $complaint = null;
-    $searched = $request->filled('no_aduan');
+        $complaint = null;
+        $searched = $request->filled('no_aduan');
 
-    if ($searched) {
-        $complaint = Complaints::with([
-            'categories',
-            'buses',
-            'stops',
-            'replays' => function ($query) {
-                $query->latest();
-            },
-        ])
-        ->where('no_aduan', trim($request->no_aduan))
-        ->first();
-    }
+        if ($searched) {
+            $complaint = Complaints::with([
+                'categories',
+                'bus',
+                'stop',
+                'replays' => function ($query) {
+                    $query->latest();
+                },
+            ])
+                ->where('no_aduan', trim($request->no_aduan))
+                ->first();
+        }
 
-    return view('Aduan.track', compact(
-        'complaint',
-        'searched'
-    ));
+        return view('Aduan.track', compact(
+            'complaint',
+            'searched'
+        ));
     }
 
     public function history()
@@ -131,11 +164,28 @@ class AduanController extends Controller
         $user = Auth::guard('web')->user();
 
         $complaints = $user->complaints()
-            ->with(['categories', 'buses', 'stops'])
+            ->with(['categories', 'bus', 'stop'])
             ->latest()
             ->paginate(10);
 
         return view('Aduan.history', compact('complaints'));
+    }
+
+    public function detail(int $id)
+    {
+        $user = Auth::guard('web')->user();
+
+        $complaint = Complaints::with([
+            'categories',
+            'bus',
+            'stop',
+            'replays.petugas',
+            'statusHistories.user',
+        ])
+            ->where('user_id', $user->id)
+            ->findOrFail($id);
+
+        return view('Aduan.detail', compact('complaint'));
     }
 
     public function show(string $id)

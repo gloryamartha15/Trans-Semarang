@@ -30,11 +30,6 @@ class PetugasForm
                     ->required(fn (string $operation): bool => $operation === 'create')
                     ->dehydrated(fn ($state) => filled($state))
                     ->minLength(8),
-
-                TextInput::make('role')
-                    ->default('petugas')
-                    ->dehydrated()
-                    ->hidden(),
             ]);
     }
 }

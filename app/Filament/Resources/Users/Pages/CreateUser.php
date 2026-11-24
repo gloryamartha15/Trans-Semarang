@@ -7,11 +7,19 @@ use Filament\Resources\Pages\CreateRecord;
 
 class CreateUser extends CreateRecord
 {
+    protected static string $resource = UserResource::class;
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-    $data['role'] = 'pengguna';
+        // Memastikan role database selalu pengguna.
+        $data['role'] = 'pengguna';
 
-    return $data;
+        return $data;
     }
-    protected static string $resource = UserResource::class;
+
+    protected function afterCreate(): void
+    {
+        // Menyinkronkan Spatie Role setelah akun dibuat.
+        $this->record->syncRoles(['pengguna']);
+    }
 }
