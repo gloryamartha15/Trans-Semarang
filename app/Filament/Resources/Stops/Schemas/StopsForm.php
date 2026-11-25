@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Stops\Schemas;
 
 use App\Models\Stops;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Placeholder;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -33,6 +34,14 @@ class StopsForm
                             TextInput::make('name_stop')
                                 ->label('Nama Halte')
                                 ->default(null),
+
+                            Textarea::make('address')
+                                ->label('Alamat Halte')
+                                ->placeholder('Masukkan alamat atau lokasi halte')
+                                ->rows(3)
+                                ->maxLength(500)
+                                ->nullable()
+                                ->columnSpanFull(),
 
                             Placeholder::make('qr_code_info')
                                 ->label('Alamat QR Code')

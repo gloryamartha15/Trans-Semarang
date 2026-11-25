@@ -13,8 +13,9 @@ class Stops extends Model
     protected $fillable = [
         'stops_number',
         'qr_code',
-        'name_stop',
         'qr_options',
+        'name_stop',
+        'address',
         'is_active',
     ];
 
@@ -41,6 +42,6 @@ class Stops extends Model
             'stop_id',
             'route_id'
         )->withPivot('stop_order')
-         ->orderByPivot('stop_order');
+            ->orderByPivot('stop_order');
     }
 }

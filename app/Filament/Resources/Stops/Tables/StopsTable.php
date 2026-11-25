@@ -14,20 +14,46 @@ class StopsTable
     {
         return $table
             ->columns([
+
                 TextColumn::make('stops_number')
-                    ->searchable(),
-                TextColumn::make('qr_code')
-                    ->searchable(),
+                    ->label('Nomor Halte')
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('name_stop')
-                    ->searchable(),
+                    ->label('Nama Halte')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('address')
+                    ->label('Alamat Halte')
+                    ->searchable()
+                    ->limit(45)
+                    ->tooltip(fn ($record) => $record->address),
+
+                TextColumn::make('qr_code')
+                    ->label('QR Code')
+                    ->searchable()
+                    ->placeholder('Belum tersedia'),
+
+                TextColumn::make('is_active')
+                    ->label('Status')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => $state ? 'Aktif' : 'Nonaktif')
+                    ->color(fn ($state) => $state ? 'success' : 'danger'),
+
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Dibuat')
+                    ->dateTime('d M Y, H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Diperbarui')
+                    ->dateTime('d M Y, H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
             ])
             ->filters([
                 //
