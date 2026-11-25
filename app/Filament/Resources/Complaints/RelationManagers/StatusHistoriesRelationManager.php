@@ -12,6 +12,10 @@ class StatusHistoriesRelationManager extends RelationManager
 
     protected static ?string $title = 'Riwayat Status Aduan';
 
+    /**
+     * Riwayat bersifat read-only.
+     * Tidak dapat diedit atau dihapus melalui panel.
+     */
     public function isReadOnly(): bool
     {
         return true;
@@ -22,10 +26,11 @@ class StatusHistoriesRelationManager extends RelationManager
         return $table
             ->columns([
 
+                // Status sebelumnya
                 TextColumn::make('old_status')
                     ->label('Status Sebelumnya')
                     ->badge()
-                    ->color(fn(?string $state): string => match ($state) {
+                    ->color(fn (?string $state): string => match ($state) {
                         'diajukan' => 'warning',
                         'ditanggapi' => 'info',
                         'selesai' => 'success',
@@ -33,13 +38,20 @@ class StatusHistoriesRelationManager extends RelationManager
                         default => 'gray',
                     })
                     ->formatStateUsing(
-                        fn(?string $state): string => $state ? ucfirst($state) : 'Status awal'
+                        fn (?string $state): string => match ($state) {
+                            'diajukan' => 'Diajukan',
+                            'ditanggapi' => 'Ditanggapi',
+                            'selesai' => 'Selesai',
+                            'ditolak' => 'Ditolak',
+                            default => 'Status Awal',
+                        }
                     ),
 
+                // Status baru
                 TextColumn::make('new_status')
                     ->label('Status Baru')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (?string $state): string => match ($state) {
                         'diajukan' => 'warning',
                         'ditanggapi' => 'info',
                         'selesai' => 'success',
@@ -47,8 +59,16 @@ class StatusHistoriesRelationManager extends RelationManager
                         default => 'gray',
                     })
                     ->formatStateUsing(
-                        fn(string $state): string => ucfirst($state)
+                        fn (?string $state): string => match ($state) {
+                            'diajukan' => 'Diajukan',
+                            'ditanggapi' => 'Ditanggapi',
+                            'selesai' => 'Selesai',
+                            'ditolak' => 'Ditolak',
+                            default => '-',
+                        }
                     ),
+
+                // Tanggapan awal petugas
                 TextColumn::make('tanggapan_petugas')
                     ->label('Tanggapan Petugas')
                     ->state(function ($record) {
@@ -65,21 +85,29 @@ class StatusHistoriesRelationManager extends RelationManager
                     ->wrap()
                     ->placeholder('-'),
 
+                // Catatan perubahan status
                 TextColumn::make('notes')
                     ->label('Catatan / Hasil Tindak Lanjut')
                     ->wrap()
                     ->placeholder('-'),
 
+                // Identitas pelaku
                 TextColumn::make('user.name')
-                    ->label('Petugas / Admin')
-                    ->placeholder('-'),
+                    ->label('Pelaku Perubahan')
+                    ->placeholder('Tidak diketahui')
+                    ->searchable(),
 
+                // Waktu perubahan
                 TextColumn::make('created_at')
-                    ->label('Tanggal')
+                    ->label('Tanggal dan Waktu')
                     ->dateTime('d M Y H:i')
                     ->sortable(),
+
             ])
+
             ->defaultSort('created_at', 'desc')
+
+            // Tidak menyediakan aksi edit dan hapus.
             ->recordActions([]);
     }
 }

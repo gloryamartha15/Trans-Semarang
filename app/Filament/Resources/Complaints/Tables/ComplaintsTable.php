@@ -2,13 +2,11 @@
 
 namespace App\Filament\Resources\Complaints\Tables;
 
-use Filament\Actions\EditAction;
+use App\Filament\Resources\Complaints\ComplaintsResource;
+use Filament\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Actions\Action;
-use App\Filament\Resources\Complaints\ComplaintsResource;
-use Illuminate\Support\Facades\Auth;
 
 class ComplaintsTable
 {
@@ -45,7 +43,7 @@ class ComplaintsTable
                 TextColumn::make('status_aduan')
                     ->label('Status')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'diajukan' => 'warning',
                         'ditanggapi' => 'info',
                         'selesai' => 'success',
@@ -53,7 +51,7 @@ class ComplaintsTable
                         default => 'gray',
                     })
                     ->formatStateUsing(
-                        fn(string $state): string => ucfirst($state)
+                        fn (string $state): string => ucfirst($state)
                     ),
 
                 TextColumn::make('created_at')
@@ -78,18 +76,14 @@ class ComplaintsTable
             ->recordActions([
                 Action::make('detail')
                     ->label('Detail')
-                    ->url(fn($record): string => ComplaintsResource::getUrl('view', [
-                        'record' => $record,
-                    ]))
-                    ->visible(fn(): bool => Auth::user()?->role === 'petugas'),
-
-                EditAction::make()
-                    ->label('Kelola')
-                    ->visible(fn(): bool => in_array(
-                        Auth::user()?->role,
-                        ['admin', 'super_admin'],
-                        true
-                    )),
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->url(fn ($record): string =>
+                        ComplaintsResource::getUrl('view', [
+                            'record' => $record,
+                        ])
+                    )
+                    ->visible(true),
             ]);
     }
 }
